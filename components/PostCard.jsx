@@ -366,8 +366,14 @@ const PostCard = ({
                   handlePostDelete();
                 }}
               >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Icon name="close" />
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    color: theme.colors.text,
+                  }}
+                >
+                  <Icon name="close" color={theme.colors.text} />
                   <Text style={[styles.menuText, { color: theme.colors.text }]}>
                     {" "}
                     Usuń
@@ -381,8 +387,14 @@ const PostCard = ({
                   onEdit(item);
                 }}
               >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Icon name="edit" />
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    color: theme.colors.text,
+                  }}
+                >
+                  <Icon name="edit" color={theme.colors.text} />
                   <Text style={[styles.menuText, { color: theme.colors.text }]}>
                     {" "}
                     Edytuj
