@@ -80,27 +80,36 @@ const CommentCard = ({
   const onLike = async () => {
     if (!user?.id) return;
     setLoading(true);
+
     if (liked) {
+      // Usuwanie polubienia
       setLikes(likes.filter((like) => like.userId !== user.id));
       await removeCommentLike(item.id, user.id);
     } else {
-      let data = {
+      // Dodawanie polubienia
+      const newLike = {
         commentId: item.id,
         postId: item.postId,
         userId: user.id,
       };
-      setLikes([...likes, data]);
-      let res = await createCommentLike(data);
+      setLikes([...likes, newLike]);
+      const res = await createCommentLike(newLike);
+
       if (!res.success) {
         alert("Nie udało się polubić komentarza");
+        // Cofnij polubienie lokalnie jeśli błąd
+        setLikes(likes);
       } else {
-        const isDuplicate = likes.some((like) => like.userId == user?.id);
-        if (!isDuplicate && user.id !== item.userId) {
-          let notificationData = {
+        // Powiadomienie tylko jeśli nie polubił już wcześniej i nie polubia swojego komentarza
+        if (
+          user.id !== item.userId &&
+          !likes.some((like) => like.userId === user.id)
+        ) {
+          const notificationData = {
             senderId: user.id,
             receiverId: item.userId,
             title: "Polubił twój komentarz",
-            data: JSON.stringify({ postId: item.id }),
+            data: JSON.stringify({ postId: item.postId, commentId: item.id }),
           };
           createNotification(notificationData);
         }
