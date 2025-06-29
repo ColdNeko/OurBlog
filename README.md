@@ -33,4 +33,6 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npx expo start
    ```
 
+**Aplikacja powinna działać na urządzeniach z systemem Android, bez możliwości dodawania nowych postów**
+
 3. Zostanie wygenerowany kod QR, który należy zeskanować na urządzeniu IOS z zainstalowanym Expo Go
