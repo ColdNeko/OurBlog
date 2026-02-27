@@ -20,7 +20,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
   0.5. Po pobraniu archiwum należy je wypakować, i wejść do stworzonego folderu, tak aby zawartością były m.in. foldery app/ assets/ components/, w głównym folderze uruchomić terminal, z zainstalowanym Node.js
 
-1. Zainstaluj zależności, **ze względu na wymóg aktualizacji SDK w trakcie pracy, pewne zależności zostały uszkodzone, przez co należy dodać dopiskę --legacy-peer-deps, co jest w planach do naprawy na później**
+1. Zainstaluj zależności, **ze względu na wymóg aktualizacji SDK w trakcie pracy, pewne zależności mogły zostać uszkodzone i w przypadku niepowodzenia instalacji należy użyć polecenia z argumentem --legacy-peer-deps**
 
    ```bash
    npm install --legacy-peer-deps
@@ -32,5 +32,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    ```bash
    npx expo start
    ```
+
+**Aplikacja powinna działać na urządzeniach z systemem Android, bez możliwości dodawania nowych postów**
 
 3. Zostanie wygenerowany kod QR, który należy zeskanować na urządzeniu IOS z zainstalowanym Expo Go
