@@ -76,6 +76,7 @@ const UserHeader = ({
               uri={user?.image}
               size={heightPercentage(17)}
               rounded={theme.radius.small}
+              enablePreview
             />
           </View>
         </View>

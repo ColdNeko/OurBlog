@@ -1,7 +1,7 @@
-import { Video } from "expo-av";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { VideoView, useVideoPlayer } from "expo-video";
 import { useEffect, useRef, useState } from "react";
 //prettier-ignore
 import { Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
@@ -28,6 +28,11 @@ const NewPost = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
+  const videoPreviewSource =
+    file && getFileType(file) == "video" ? { uri: getFileUri(file) } : null;
+  const videoPreviewPlayer = useVideoPlayer(videoPreviewSource, (player) => {
+    player.loop = true;
+  });
 
   useEffect(() => {
     if (post && post.id) {
@@ -41,9 +46,7 @@ const NewPost = () => {
 
   const onPick = async (isImage) => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: isImage
-        ? ImagePicker.MediaTypeOptions.Images
-        : ImagePicker.MediaTypeOptions.Videos,
+      mediaTypes: isImage ? ["images"] : ["videos"],
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
@@ -147,19 +150,16 @@ const NewPost = () => {
               {file && (
                 <View style={styles.file}>
                   {getFileType(file) == "video" ? (
-                    <Video
+                    <VideoView
                       style={styles.video}
-                      source={{
-                        uri: getFileUri(file),
-                      }}
-                      useNativeControls
-                      resizeMode="cover"
-                      isLooping
+                      player={videoPreviewPlayer}
+                      nativeControls
+                      contentFit="cover"
                     />
                   ) : (
                     <Image
                       source={{ uri: getFileUri(file) }}
-                      resizeMode="cover"
+                      contentFit="cover"
                       style={{ flex: 1 }}
                     />
                   )}

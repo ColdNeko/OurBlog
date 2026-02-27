@@ -1,10 +1,10 @@
-import { Video } from "expo-av";
 import { Image } from "expo-image";
+import { VideoView, useVideoPlayer } from "expo-video";
 import moment from "moment";
 import "moment/locale/pl";
 import { useEffect, useState } from "react";
 //prettier-ignore
-import { Alert, Pressable, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Modal, Pressable, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import RenderHTML from "react-native-render-html";
 import Icon from "../assets/icons";
 import { useTheme } from "../contexts/ThemeContext";
@@ -36,6 +36,7 @@ const PostCard = ({
   const { theme } = useTheme();
   const [likes, setLikes] = useState(item?.postLikes || []);
   const [loading, setLoading] = useState(false);
+  const [isImagePreviewVisible, setIsImagePreviewVisible] = useState(false);
 
   const shadowStyles = hasShadow
     ? {
@@ -66,7 +67,7 @@ const PostCard = ({
       .format("D MMMM")
       .replace(
         / ([a-ząćęłńóśźż])/i,
-        (m) => " " + m[1].toUpperCase() + m.slice(2)
+        (m) => " " + m[1].toUpperCase() + m.slice(2),
       );
   }
 
@@ -89,7 +90,7 @@ const PostCard = ({
         alert("Nie udało się polubić posta");
       } else {
         const isDuplicate = likes.some(
-          (like) => like.userId == currentUser?.id
+          (like) => like.userId == currentUser?.id,
         );
         if (!isDuplicate && currentUser.id !== item.userId) {
           let notificationData = {
@@ -137,6 +138,17 @@ const PostCard = ({
   const liked =
     Array.isArray(likes) &&
     likes.some((like) => like.userId == currentUser?.id);
+  const videoSource =
+    item?.file && item?.file?.includes("postVideos")
+      ? getSupabaseFileUrl(item?.file)?.uri || null
+      : null;
+  const postImageSource =
+    item?.file && item?.file?.includes("postImages")
+      ? getSupabaseFileUrl(item?.file)
+      : null;
+  const videoPlayer = useVideoPlayer(videoSource, (player) => {
+    player.loop = true;
+  });
   const isAuthor = currentUser?.id === item?.userId;
   const isAdmin = currentUser?.isAdmin == true;
 
@@ -271,20 +283,26 @@ const PostCard = ({
             )}
           </View>
           {item?.file && item?.file?.includes("postImages") && (
-            <Image
-              source={getSupabaseFileUrl(item?.file)}
-              transition={100}
-              style={[
-                styles.poshtMedia,
-                { borderRadius: theme.radius.extraLarge },
-              ]}
-              contentFit="cover"
-            />
+            <Pressable
+              onPress={(e) => {
+                e.stopPropagation();
+                setIsImagePreviewVisible(true);
+              }}
+            >
+              <Image
+                source={postImageSource}
+                transition={100}
+                style={[
+                  styles.poshtMedia,
+                  { borderRadius: theme.radius.extraLarge },
+                ]}
+                contentFit="cover"
+              />
+            </Pressable>
           )}
           {item?.file && item?.file?.includes("postVideos") && (
-            <Video
-              source={getSupabaseFileUrl(item?.file)}
-              transition={100}
+            <VideoView
+              player={videoPlayer}
               style={[
                 styles.poshtMedia,
                 {
@@ -292,9 +310,8 @@ const PostCard = ({
                   borderRadius: theme.radius.extraLarge,
                 },
               ]}
-              resizeMode="cover"
-              useNativeControls
-              isLooping
+              contentFit="cover"
+              nativeControls
             />
           )}
         </View>
@@ -405,6 +422,23 @@ const PostCard = ({
           </>
         )}
       </View>
+      <Modal
+        visible={isImagePreviewVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsImagePreviewVisible(false)}
+      >
+        <Pressable
+          style={styles.imagePreviewOverlay}
+          onPress={() => setIsImagePreviewVisible(false)}
+        >
+          <Image
+            source={postImageSource}
+            style={styles.imagePreview}
+            contentFit="contain"
+          />
+        </Pressable>
+      </Modal>
     </TouchableOpacity>
   );
 };
@@ -521,5 +555,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
 
     textAlign: "center",
+  },
+  imagePreviewOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 12,
+  },
+  imagePreview: {
+    width: "100%",
+    height: "100%",
   },
 });

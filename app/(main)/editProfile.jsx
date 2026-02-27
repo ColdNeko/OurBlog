@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -25,6 +26,7 @@ const EditProfile = () => {
   const { user: currentUser, setUserData } = useAuth();
   const { theme } = useTheme();
   const [loading, setLoading] = useState(false);
+  const [isImagePreviewVisible, setIsImagePreviewVisible] = useState(false);
   const router = useRouter();
 
   const [user, setUser] = useState({
@@ -49,7 +51,7 @@ const EditProfile = () => {
 
   const onPickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
@@ -87,7 +89,7 @@ const EditProfile = () => {
 
     if (!validateBirthdate(birthdate)) {
       alert(
-        "Podaj datę urodzenia w formacie YYYY-MM-DD i upewnij się, że jest poprawna"
+        "Podaj datę urodzenia w formacie YYYY-MM-DD i upewnij się, że jest poprawna",
       );
       return;
     }
@@ -135,16 +137,21 @@ const EditProfile = () => {
             <Header title="Edytuj Profil" showBackButton={true} />
             <View style={styles.form}>
               <View style={styles.avatarContainer}>
-                <Image
-                  source={imageSource}
-                  style={[
-                    styles.avatar,
-                    {
-                      borderRadius: theme.radius.extraLarge * 1.8,
-                      borderColor: theme.colors.darkLight,
-                    },
-                  ]}
-                />
+                <Pressable
+                  onPress={() => setIsImagePreviewVisible(true)}
+                  style={styles.avatarPressable}
+                >
+                  <Image
+                    source={imageSource}
+                    style={[
+                      styles.avatar,
+                      {
+                        borderRadius: theme.radius.extraLarge * 1.8,
+                        borderColor: theme.colors.darkLight,
+                      },
+                    ]}
+                  />
+                </Pressable>
                 <Pressable
                   style={[
                     styles.cameraIcon,
@@ -220,6 +227,23 @@ const EditProfile = () => {
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
+      <Modal
+        visible={isImagePreviewVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsImagePreviewVisible(false)}
+      >
+        <Pressable
+          style={styles.imagePreviewOverlay}
+          onPress={() => setIsImagePreviewVisible(false)}
+        >
+          <Image
+            source={imageSource}
+            style={styles.imagePreview}
+            contentFit="contain"
+          />
+        </Pressable>
+      </Modal>
     </ScreenWrapper>
   );
 };
@@ -235,6 +259,9 @@ const styles = StyleSheet.create({
     height: widthPercentage(45),
     width: widthPercentage(45),
     alignSelf: "center",
+  },
+  avatarPressable: {
+    borderRadius: 999,
   },
   avatar: {
     height: "100%",
@@ -269,5 +296,16 @@ const styles = StyleSheet.create({
     height: heightPercentage(15),
     alignItems: "flex-start",
     paddingVertical: 10,
+  },
+  imagePreviewOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 12,
+  },
+  imagePreview: {
+    width: "100%",
+    height: "100%",
   },
 });

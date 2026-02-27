@@ -11,6 +11,7 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import { heightPercentage, widthPercentage } from "../../helpers/common";
+import { getNotificationsCount } from "../../services/notificationService";
 import { fetchPosts } from "../../services/postService";
 import { fetchUsersByName, getUserData } from "../../services/userService";
 
@@ -71,7 +72,8 @@ const Home = () => {
       setHasMore(res.data.length == limit);
     }
     if (!user?.id) return;
-    await getNotificationsCount();
+    const cntRes = await getNotificationsCount(user.id);
+    if (cntRes?.success) setNotifications(cntRes.count);
   };
 
   // tymczasowo bezużyteczne, ponieważ nie działa poprawnie subskrypcja kanału, w celu odświeżenia tablicy, należy przeciągnąć w dół.

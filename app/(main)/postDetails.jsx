@@ -16,6 +16,7 @@ import { supabase } from "../../lib/supabase";
 import { createNotification } from "../../services/notificationService";
 //prettier-ignore
 import { fetchPostDetails, postComment, removeComment, removePost, } from "../../services/postService";
+import { getUserData } from "../../services/userService";
 
 const PostDetails = () => {
   const { postId, commentId } = useLocalSearchParams();
@@ -96,7 +97,7 @@ const PostDetails = () => {
       setPost((prev) => {
         let updatedPost = { ...prev };
         updatedPost.comments = updatedPost.comments.filter(
-          (c) => c.id != comment.id
+          (c) => c.id != comment.id,
         );
         return updatedPost;
       });
@@ -135,7 +136,7 @@ const PostDetails = () => {
           table: "comments",
           filter: `postId=eq.${postId}`,
         },
-        handleCommentEvent
+        handleCommentEvent,
       )
       .subscribe((status) => {
         console.log("Comment channel status:", status);
